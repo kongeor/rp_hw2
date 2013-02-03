@@ -1,5 +1,6 @@
 class MoviesController < ApplicationController
 
+
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
@@ -7,12 +8,15 @@ class MoviesController < ApplicationController
   end
 
   def index
+    print params
+    @all_ratings = %w[G PG PG-13 R]
     if params['sort_by'] == "title"
       @movies = Movie.order('title')
     elsif params['sort_by'] == "release_date"
       @movies = Movie.order('release_date')
     else
-      @movies = Movie.all
+      #@movies = Movie.where("rating = ?", params[:ratings].keys.join(' '))
+      @movies = Movie.where(["rating in (?)", params[:ratings].keys])
     end
   end
 
