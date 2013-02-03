@@ -10,13 +10,20 @@ class MoviesController < ApplicationController
   def index
     print params
     @all_ratings = %w[G PG PG-13 R]
-    if params['sort_by'] == "title"
-      @movies = Movie.order('title')
-    elsif params['sort_by'] == "release_date"
-      @movies = Movie.order('release_date')
+    if params[:ratings]
+      movies = Movie.where(["rating in (?)", params[:ratings].keys])
     else
-      #@movies = Movie.where("rating = ?", params[:ratings].keys.join(' '))
-      @movies = Movie.where(["rating in (?)", params[:ratings].keys])
+      movies = Movie.all
+      ones = @all_ratings.zip(%w[1 1 1 1]).flatten
+      default_ratings = { :ratings => Hash[*ones] }
+      redirect_to movies_path default_ratings
+    end
+    if params['sort_by'] == "title"
+      @movies = movies.order('title')
+    elsif params['sort_by'] == "release_date"
+      @movies = movies.order('release_date')
+    else
+      @movies = movies
     end
   end
 
